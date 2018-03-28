@@ -4,84 +4,214 @@
 
 html, body {
   height: 100%;
+  font-family: Arial, Helvetica, sans-serif ;
 }
 
 body {
   background-attachment: fixed;
 }
 
-.btn-block {
-    display: flex;
-    justify-content: space-between;
-    background: wheat;
-    align-items: center;
+.container {
+    @include container;
 }
 
-    .month-name, .year-name {
-        font-weight: bold;
-        text-transform: capitalize;
-    }
 
-    .btn {
-        cursor: pointer;
-    }
-
-.calendar-wrap {
-    // border: 1px solid black;
-    max-width: 560px;
-    padding: 10px;
-    margin: 5px auto 0 auto;
-}
-
-    .calendar-days {
+    .btn-block {
         display: flex;
-        list-style: none;
-        margin: 0;
-        padding: 0;
+        justify-content: space-between;
+        background: darkgray;
+        align-items: center;
     }
 
-        .dayWeek {
-            width: 14.286%;
-            padding: 10px;
-            text-align: center;
-            
-
-            &:nth-of-type(7n - 1), &:nth-of-type(7n) {
-            color: rgb(252, 84, 84);
-            }
+        .month-name, .year-name {
+            font-weight: bold;
+            text-transform: capitalize;
+            color: white;
         }
 
-    .calendar-layout {
-        display: flex;
-        flex-wrap: wrap;
-        list-style: none;
-        margin: 0;
-        padding: 0;
+        .btn {
+            outline: none;
+            border: none;
+            padding: 0;
+            margin: 5px;
+            width: 30px;
+            height: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 20px;
+            color: black;
+            box-shadow: 1px 1px 5px rgb(99, 96, 96);
+            cursor: pointer;
+        }
+
+    .calendar-wrap {
+        max-width: 780px;
+        height: 480px;
+        padding: 10px;
+        margin: 5px auto 0 auto;
+        background-color: darkgray;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); 
     }
 
-        .day {
-        width: 14.286%;
-        padding: 10px;
-        cursor: pointer;
-        
-            &--bingo {
-                font-size: 0.5rem;
-                box-shadow: 0 0 1px grey;
-                color: rgb(73, 73, 73);
-                background: rgb(255, 255, 255);
+        .calendar-days {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
 
-                &:hover {
-                    box-shadow: 0 0 3px grey;;
-                    font-weight: bold;
+            .dayWeek {
+                width: 14.286%;
+                padding: 10px;
+                text-align: center;
+                
+
+                &:nth-of-type(7n - 1), &:nth-of-type(7n) {
+                color:rgb(124, 19, 0); 
                 }
             }
-            // &:nth-of-type(7n - 1), &:nth-of-type(7n) {
-            //     background: rgb(216, 216, 216);
-            //     color: rgb(252, 84, 84);
 
-            //     &:hover {
-            //         box-shadow: 0 0 3px grey;
-            //         font-weight: bold;
-            //     }
-            // }
+        .calendar-layout {
+            display: flex;
+            flex-wrap: wrap;
+            list-style: none;
+            margin: 0;
+            padding: 0;
         }
+
+            .day {
+            width: 14.286%;
+            padding: 10px;
+            height: 64px;
+            cursor: pointer;
+            
+                &--bingo {
+                    font-size: 0.8rem;
+                    box-shadow: 0 0 1px whitesmoke;
+                    color: whitesmoke;
+                    background: grey;
+
+                    &:hover {
+                        outline-offset: -1.5px;
+                        outline: 1.5px dashed whitesmoke;;
+                        font-weight: bold;
+                    }
+                }
+            }
+
+.notes-group {
+    margin-top: 20px;
+}
+    .addNoteBtn-row {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+        .addNoteBtn {
+            outline: none;
+            border: none;
+            padding: 0;
+            margin: 5px;
+            width: 60px;
+            height: 60px;
+            font-size: 1rem;
+            font-weight: bold;
+            background: rgb(250, 69, 69);
+            border-radius: 50%;
+            color: white;
+            box-shadow: 1px 1px 5px rgb(99, 96, 96);
+            cursor: pointer;
+
+            &:active {
+                box-shadow: none;
+            }
+        }
+    
+    .notes-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .notes-item {
+            padding: 5px 50px;
+            border-radius: 20px;
+            background: #a9a9a9;
+            width: 70%;
+            margin: 0 auto 5px auto;
+            max-width: 780px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); 
+
+            &--complete {
+                background: #dfdfdf;
+            }
+
+            &--complete > h3, &--complete > p {
+                text-decoration: line-through;
+                color: #a9a9a9;
+            }
+        }
+        
+
+            .item-btns-block {
+                padding: 5px;
+                text-align: right;
+            }
+                .item-btn {
+                    text-decoration: none;
+                    margin-left: 25px;
+                    color: rgb(255, 255, 255);
+                    
+                    &:first-child {
+                        margin-left: 0;
+                    }
+                    
+                    &--done {
+                        color: green;
+                    }
+                }
+
+                .item-title:first-letter, .item-text:first-letter {
+                    text-transform: uppercase;
+                } 
+
+
+// modules
+
+.modal-newNote {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 400px;
+    background: #a9a9a9;
+    padding: 30px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 2;
+    text-align: center;
+    color: whitesmoke;
+    box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    display: none;
+
+    textarea {
+        height: 100px;
+    }
+}   
+
+    .cancel {
+        position: absolute;
+        right: 20px; top: 10px;
+        cursor: pointer;
+        color: rgb(124, 19, 0);
+    }
+
+    .modal-input {
+        display: block;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .modal-btn {
+        padding: 10px;
+    }
