@@ -90,9 +90,10 @@ body {
             padding: 10px;
             height: 64px;
             cursor: pointer;
+            position: relative;
             
                 &--bingo {
-                    font-size: 0.8rem;
+                    font-size: 1.8rem;
                     box-shadow: 0 0 1px whitesmoke;
                     color: whitesmoke;
                     background: grey;
@@ -104,6 +105,17 @@ body {
                     }
                 }
             }
+                .day-tasksqty {
+                    display: inline-block;
+                    width: 20px;
+                    text-align: center;
+                    background: blue;
+                    line-height: 20px;
+                    border-radius: 50%;
+                    position: absolute;
+                    right: 8px; top: 8px;
+                    font-size: 0.6rem;
+                }
 
 .notes-group {
     margin-top: 20px;
