@@ -15,6 +15,11 @@ body {
     @include container;
 }
 
+.main {
+    width: 100%;
+    height: 100%;
+}
+
 
     .btn-block {
         display: flex;

@@ -10,15 +10,18 @@ class Calendar {
         // helpers variable
         this.year = new Date().getFullYear();
         this.month = new Date().getMonth();
+        this.date = new Date().getDate();
         this.weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
 
         // DOM
+        this.mainLayout = document.querySelector('.main');
         this.calendarWrap = document.querySelector('.calendar-layout');
         this.calendarWeekDays = document.querySelector('.calendar-days');
         this.btnsMonth = document.querySelectorAll('.btn');
         this.monthName = document.querySelector('.month-name');
         this.yearName = document.querySelector('.year-name');
         this.btnAddNewNote = document.querySelector('.addNoteBtn');
+        this.notesList = document.querySelector('.notes-list');
         
         // modal For Input NewNote
         this.modalForInputNewNote = document.querySelector('.modal-newNote');
@@ -27,6 +30,7 @@ class Calendar {
         
         this._initCalendarLayout('day', 'day--bingo');
         this._initComponents(this.calendarWeekDays, 'dayWeek');
+        this._addEl(this._formateDate())
         this._events();
     }
 
@@ -37,9 +41,17 @@ class Calendar {
 
 
         // modal For Input NewNote
-        this.btnAddNewNote.addEventListener('click', (e) => this.modalForInputNewNote.style.display = 'block');
+        this.btnAddNewNote.addEventListener('click', (e) => {
+            this.modalForInputNewNote.style.display = 'block';
+            this.mainLayout.style.filter = 'blur(3px)'
+        });
         this.modalForInputNewNote.querySelector('form').addEventListener('submit', this._getData.bind(this));
-        this.modalClose.addEventListener('click', () => this.modalForInputNewNote.style.display = null);
+        this.modalClose.addEventListener('click', () => {
+            this.modalForInputNewNote.style.display = null
+            this.mainLayout.style.filter = null
+        });
+
+        this.notesList.addEventListener('click', this._itemBtnsHandler.bind(this));
     }
 
     _initCalendarLayout(dayClass, dayActiveClass) {
@@ -102,8 +114,7 @@ class Calendar {
         this._initCalendarLayout('day', 'day--bingo', 'day--weekend');
     }
 
-    _addEl(newNoteData) {
-    //   let noteData = this._getData();
+    _addEl(itemKey) {
       let el = `<h3 class="item-title">Title</h3>
                 <p class="item-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iusto reprehenderit natus nihil veritatis voluptates, dicta iste voluptatem alias doloremque illo?</p>
                 <p class="item-date">2018-11-05</p>
@@ -119,16 +130,20 @@ class Calendar {
                     </a>	
                 </div>
                 `
-        let newLi = document.createElement('LI');
-            newLi.classList.add('notes-item')
-            newLi.innerHTML = el;
-            newLi.querySelector('.item-title').innerHTML = newNoteData.title;
-            newLi.querySelector('.item-text').innerHTML = newNoteData.note;
-            newLi.querySelector('.item-date').innerHTML = newNoteData.date;
-        document.querySelector('.notes-list').appendChild(newLi);
-        document.querySelectorAll('.item-btn').forEach(el => {
-            el.addEventListener('click', this._itemBtnsHandler.bind(this));
-        });
+        let item = this._localStorageRead(itemKey) || 0;
+        let currentListLength = document.querySelector('.notes-list').children.length;
+        if (item.length === currentListLength) return;
+        if (item.length - currentListLength > 0) {
+            for (let i = currentListLength; i < (currentListLength + item.length - currentListLength); i++) {
+                let newLi = document.createElement('LI');
+                    newLi.classList.add('notes-item')
+                    newLi.innerHTML = el;
+                    newLi.querySelector('.item-title').innerHTML = item[i].title;
+                    newLi.querySelector('.item-text').innerHTML = item[i].note;
+                    newLi.querySelector('.item-date').innerHTML = item[i].date;
+                document.querySelector('.notes-list').appendChild(newLi);
+            }
+        }        
     }
 
     _getData(e) { 
@@ -140,40 +155,79 @@ class Calendar {
             note: target.querySelector('[name="note"]').value
         }
 
-        this._localStorage(newNoteData);
+        this._localStoragePush(newNoteData);
         
         target.querySelectorAll('[name]').forEach((el) => {
             el.value = '';
         })
         this.modalForInputNewNote.style.display = null;
-
-        this._addEl(newNoteData)
+        this.mainLayout.style.filter = null;
     }
 
     _itemBtnsHandler(e) {
         e.preventDefault();
-        let target = e.currentTarget;
+        let noteItemIndex = this._findIndexElInList(e.target.closest("LI"));
+        
+        let target = e.target.closest('a.item-btn');
+        if(!target) return;
+         
         let id = target.getAttribute('href');
         switch (id) {
             case '#done': 
-                target.classList.toggle('item-btn--done');
-                target.closest('LI').classList.toggle('notes-item--complete');
+            target.classList.toggle('item-btn--done');
+            target.closest('LI').classList.toggle('notes-item--complete');
                 break;
-            case '#remove':
-                target.closest('LI').remove();
+                case '#remove':
+                    this._localStorageRemove(noteItemIndex)
+                    target.closest('LI').remove();
                 break;
-            default:
-                break;
+            }
+        }
+        
+    _localStoragePush(noteData) {
+        let itemsArr = (localStorage.getItem(noteData.date)) ? JSON.parse(localStorage.getItem(noteData.date)) : [];
+        itemsArr.push(noteData);
+        let itemsArrJson = JSON.stringify(itemsArr);
+        localStorage.setItem(noteData.date, itemsArrJson);
+        
+        let NameFormateDate = this._formateDate();
+        
+        if (noteData.date == NameFormateDate) {
+            this._addEl(noteData.date);
         }
     }
+    
+    _localStorageRead(...rest) {
+        if(rest) {
+            let item = JSON.parse(localStorage.getItem(rest[0]));
+            return item
+        } 
+    }
+    
+    _localStorageRemove(index) {
+        let date = this._formateDate();
+        let itemsArr = this._localStorageRead(date);
+        itemsArr.splice(index, 1);
+        let itemsArrJson = JSON.stringify(itemsArr);
+        localStorage.setItem(date, itemsArrJson);
+    }
+    
+    _formateDate() {
+        let monthNameFormate = (String(this.month).length === 1) ? '0' + (this.month + 1) : this.month + 1;
+        let dateNameFormate = (String(this.date).length === 1) ? '0' + this.date : this.date;
+        return String(this.year + '-' + monthNameFormate + '-' + dateNameFormate)
+    }
 
-    _localStorage(...rest) {
-        if(rest.length) {
-            let itemsArr = (localStorage.getItem(rest[0].date)) ? JSON.parse(localStorage.getItem(rest[0].date)) : [];
-                itemsArr.push(rest[0]);
-            let itemsArrJson = JSON.stringify(itemsArr);
-                localStorage.setItem(rest[0].date, itemsArrJson);
+    _findIndexElInList(item) {
+        let parentEl = item.parentElement.children; 
+        let itemsArr = [].slice.call(parentEl);
+        let count = -1;
+        let currentItem = item;
+        while(currentItem) {
+            currentItem = currentItem.previousElementSibling;
+            count++
         }
+        return count;
     }
 
 }
