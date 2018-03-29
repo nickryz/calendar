@@ -12,6 +12,7 @@ class Calendar {
         this.month = new Date().getMonth();
         this.date = new Date().getDate();
         this.weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+        this.currentNoteIndex = -1;
 
         // DOM
         this.mainLayout = document.querySelector('.main');
@@ -39,18 +40,14 @@ class Calendar {
             el.addEventListener('click', this._monthLayoutChange.bind(this))
         });
 
-
+        this.calendarWrap.addEventListener('click', this._changeDayInCalendar.bind(this));
         // modal For Input NewNote
         this.btnAddNewNote.addEventListener('click', (e) => {
             this.modalForInputNewNote.style.display = 'block';
             this.mainLayout.style.filter = 'blur(3px)'
         });
         this.modalForInputNewNote.querySelector('form').addEventListener('submit', this._getData.bind(this));
-        this.modalClose.addEventListener('click', () => {
-            this.modalForInputNewNote.style.display = null
-            this.mainLayout.style.filter = null
-        });
-
+        this.modalClose.addEventListener('click', this._hideModalForInputNewNote.bind(this));
         this.notesList.addEventListener('click', this._itemBtnsHandler.bind(this));
     }
 
@@ -61,8 +58,8 @@ class Calendar {
 
         for (let i = 0; i < daysInMonth; i++) {
             let dayElem = document.createElement('LI');
-            dayElem.classList.add(dayClass);
-            dayElem.classList.add(dayActiveClass);
+            dayElem.classList.add(dayClass, dayActiveClass);
+            dayElem.dataset.date = i + 1;
             dayElem.innerHTML = i + 1;
             if (i === 1) {
             }
@@ -77,6 +74,22 @@ class Calendar {
         while (this.calendarWrap.firstChild) {
             this.calendarWrap.removeChild(this.calendarWrap.firstChild);
         }
+    }
+
+    _clearNotes() {
+        this.notesList.querySelectorAll('li').forEach((el) => {
+            el.remove()
+        })
+    }
+
+    _changeDayInCalendar(e) {
+        if(e.target !== e.currentTarget) {
+            this._clearNotes(); 
+            let target = e.target.closest('li');
+            let date = target.dataset.date;
+            this.date = (date.length == 1) ? '0' + date : date;
+        }
+        this._addEl(this._formateDate());
     }
     
     _initComponents(weekDays, weekDaysClass) {
@@ -141,23 +154,63 @@ class Calendar {
                     newLi.querySelector('.item-title').innerHTML = item[i].title;
                     newLi.querySelector('.item-text').innerHTML = item[i].note;
                     newLi.querySelector('.item-date').innerHTML = item[i].date;
+                if (item[i].done) {
+                    newLi.querySelector('[href="#done"]').classList.add('item-btn--done');
+                    newLi.classList.add('notes-item--complete');
+                }
                 document.querySelector('.notes-list').appendChild(newLi);
             }
         }        
     }
 
+    _changeEl(itemKey) {
+        let item = this._localStorageRead(itemKey)[this.currentNoteIndex];
+        console.log(item)
+        if (item) {
+            let li = document.querySelectorAll('.notes-item')[this.currentNoteIndex];
+                li.querySelector('.item-title').innerHTML = item.title;
+                li.querySelector('.item-text').innerHTML = item.note;
+                li.querySelector('.item-date').innerHTML = item.date;
+        }
+    }
+
+    _getValues() {
+        let title = this.modalForInputNewNote.querySelector('[name="title"]').value;
+        let date = this.modalForInputNewNote.querySelector('[name="date"]').value;
+        let note = this.modalForInputNewNote.querySelector('[name="note"]').value;
+        return {
+            title: title,
+            date: date,
+            note: note,
+            done: false
+        }
+    }
+    
     _getData(e) { 
         e.preventDefault();
-        let target = e.currentTarget;
-        let newNoteData  = {
-            title: target.querySelector('[name="title"]').value, 
-            date: target.querySelector('[name="date"]').value, 
-            note: target.querySelector('[name="note"]').value
+        if(this.currentNoteIndex === -1) {
+            let data = this._getValues();
+            this._localStoragePush(data);
+        } else if (this.currentNoteIndex >= 0){
+            let data = this._getValues();
+            let itemsArr = this._localStorageRead(data.date);
+            if (!itemsArr || data.date !== this._formateDate()) {
+                this._localStoragePush(data);
+                this._localStorageRemove(this.currentNoteIndex);
+                document.querySelectorAll('.notes-item')[this.currentNoteIndex].remove();
+            } else if (data.date == this._formateDate()) {
+                let currentArr = this._localStorageRead(data.date);
+                currentArr[this.currentNoteIndex] = data;
+                this._localStorageChange(currentArr)
+                this._changeEl(data.date);
+            }
+            this.currentNoteIndex = -1;
         }
+        this._hideModalForInputNewNote();
+    }
 
-        this._localStoragePush(newNoteData);
-        
-        target.querySelectorAll('[name]').forEach((el) => {
+    _hideModalForInputNewNote() {
+        this.modalForInputNewNote.querySelectorAll('[name]').forEach((el) => {
             el.value = '';
         })
         this.modalForInputNewNote.style.display = null;
@@ -173,16 +226,29 @@ class Calendar {
          
         let id = target.getAttribute('href');
         switch (id) {
-            case '#done': 
-            target.classList.toggle('item-btn--done');
-            target.closest('LI').classList.toggle('notes-item--complete');
+            case '#done':
+            let itemsArr = this._localStorageRead(this._formateDate());
+            let targetItem = itemsArr[noteItemIndex];
+                targetItem.done = !targetItem.done;
+                this._localStorageChange(itemsArr);
+                target.classList.toggle('item-btn--done');
+                target.closest('LI').classList.toggle('notes-item--complete');
                 break;
-                case '#remove':
-                    this._localStorageRemove(noteItemIndex)
-                    target.closest('LI').remove();
+            case '#remove':
+                this._localStorageRemove(noteItemIndex)
+                target.closest('LI').remove();
                 break;
-            }
+            case '#edit':
+                this.modalForInputNewNote.style.display = 'block';
+                this.mainLayout.style.filter = 'blur(3px)';
+                let itemData = this._localStorageRead(this._formateDate())[noteItemIndex];
+                this.modalForInputNewNote.querySelector('[name="title"]').value = itemData.title;
+                this.modalForInputNewNote.querySelector('[name="date"]').value = itemData.date;
+                this.modalForInputNewNote.querySelector('[name="note"]').value = itemData.note;
+                this.currentNoteIndex = noteItemIndex;
+                break;
         }
+    }
         
     _localStoragePush(noteData) {
         let itemsArr = (localStorage.getItem(noteData.date)) ? JSON.parse(localStorage.getItem(noteData.date)) : [];
@@ -190,16 +256,22 @@ class Calendar {
         let itemsArrJson = JSON.stringify(itemsArr);
         localStorage.setItem(noteData.date, itemsArrJson);
         
-        let NameFormateDate = this._formateDate();
+        let nameFormateDate = this._formateDate();
         
-        if (noteData.date == NameFormateDate) {
+        if (noteData.date == nameFormateDate) {
             this._addEl(noteData.date);
         }
     }
+
+    _localStorageChange(itemsArr) {
+        console.log(itemsArr)
+        let itemsArrJson = JSON.stringify(itemsArr);
+        localStorage.setItem(this._formateDate(), itemsArrJson);
+    }
     
-    _localStorageRead(...rest) {
-        if(rest) {
-            let item = JSON.parse(localStorage.getItem(rest[0]));
+    _localStorageRead(date) {
+        if(date) {
+            let item = JSON.parse(localStorage.getItem(date));
             return item
         } 
     }
