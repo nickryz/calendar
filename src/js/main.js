@@ -19,6 +19,7 @@ class Calendar {
         this.calendarWrap = document.querySelector('.calendar-layout');
         this.calendarWeekDays = document.querySelector('.calendar-days');
         this.btnsMonth = document.querySelectorAll('.btn');
+        this.dateName = document.querySelector('.date-name');
         this.monthName = document.querySelector('.month-name');
         this.yearName = document.querySelector('.year-name');
         this.btnAddNewNote = document.querySelector('.addNoteBtn');
@@ -29,7 +30,7 @@ class Calendar {
         this.modalClose = document.querySelector('.cancel');
         
         
-        this._initCalendarLayout('day', 'day--bingo', 'day-tasksqty');
+        this._initCalendarLayout('day', 'day--active', 'day-tasksqty');
         this._initComponents(this.calendarWeekDays, 'dayWeek');
         this._addEl(this._formateDate())
         this._events();
@@ -42,13 +43,16 @@ class Calendar {
 
         this.calendarWrap.addEventListener('click', this._changeDayInCalendar.bind(this));
         // modal For Input NewNote
-        this.btnAddNewNote.addEventListener('click', (e) => {
-            this.modalForInputNewNote.style.display = 'block';
-            this.mainLayout.style.filter = 'blur(3px)'
-        });
+        this.btnAddNewNote.addEventListener('click', this._btnAddNewNoteHandler.bind(this));
         this.modalForInputNewNote.querySelector('form').addEventListener('submit', this._getData.bind(this));
         this.modalClose.addEventListener('click', this._hideModalForInputNewNote.bind(this));
         this.notesList.addEventListener('click', this._itemBtnsHandler.bind(this));
+    }
+
+    _btnAddNewNoteHandler(e) {
+        this.modalForInputNewNote.style.display = 'block';
+        this.mainLayout.style.filter = 'blur(3px)';
+        this.modalForInputNewNote.querySelector('[name="date"]').value = this._formateDate();
     }
 
     _initCalendarLayout(dayClass, dayActiveClass, taskQtyElClass) {
@@ -57,35 +61,38 @@ class Calendar {
         let firstDayInMonth = d.getDay();
         for (let i = 0; i < daysInMonth; i++) {
             let dayElem = document.createElement('LI');
-                dayElem.classList.add(dayClass, dayActiveClass);
+                (this.date - 1 == i) ? dayElem.classList.add(dayClass, dayActiveClass) : dayElem.classList.add(dayClass);
                 dayElem.dataset.date = i + 1;
                 dayElem.innerHTML = i + 1;
-            
                 this.calendarWrap.appendChild(dayElem);
+            let taskQtyInDayEl = document.createElement('SPAN');
+                taskQtyInDayEl.classList.add(taskQtyElClass);
+                dayElem.appendChild(taskQtyInDayEl);
             }
             this.calendarWrap.firstChild.style.marginLeft = (firstDayInMonth !== 0) ? `${100 / 7 * (firstDayInMonth - 1)}%` : `${100 / 7 * 6}%`
-            this.monthName.innerHTML = d.toLocaleString('ru', { month: "long" });
-            this.yearName.innerHTML = d.getFullYear();
+            this.dateName.innerHTML = this.date;
+            this.monthName.innerHTML = d.toLocaleString('en', { month: "long" });
+            this.yearName.innerHTML = this.year;
             this._addTaskQtyInDateEl(taskQtyElClass);
         }
         
     _addTaskQtyInDateEl(taskQtyElClass) {
-        let notesArr = document.querySelectorAll('.day');
-        notesArr.forEach((el) => {
-        let date = el.dataset.date;
-        if (this._getTaskQtyInDate(date)) {
-            let taskQtyEl = document.createElement('SPAN');
-                taskQtyEl.classList.add(taskQtyElClass);
-                taskQtyEl.innerHTML = this._getTaskQtyInDate(date);
-                el.appendChild(taskQtyEl);
+        let taskQtyInDayEl = document.querySelectorAll('.' + taskQtyElClass);
+        taskQtyInDayEl.forEach((el) => {
+            let date = el.parentElement.dataset.date;
+            let elLength = this._getTaskQtyInDate(date);
+            if (elLength && elLength !== el.innerHTML) {
+                el.innerHTML = elLength;
+                el.style.display = 'inline';  
+            } else {
+                el.style.display = null;
             }
-        })
+        }) 
     }
 
     _getTaskQtyInDate(i) {
         let date = (i < 10) ? '0' + i : i;
         let localStorage = this._localStorageRead(this._formateDate().slice(0, -2) + date);
-        
         if (!localStorage || !localStorage.length) return;
         return localStorage.length;
     }
@@ -104,12 +111,14 @@ class Calendar {
     }
 
     _changeDayInCalendar(e) {
-        if(e.target !== e.currentTarget) {
-            this._clearNotes(); 
-            let target = e.target.closest('li');
-            let date = target.dataset.date;
-            this.date = (date.length == 1) ? '0' + date : date;
-        }
+        if(e.target === e.currentTarget) return;
+        
+        this._clearNotes(); 
+        document.querySelector('.day--active').classList.remove('day--active');
+        let target = e.target.closest('li');
+            target.classList.add('day--active');
+        let date = target.dataset.date;
+        this.date = (date.length == 1) ? '0' + date : date;
         this._addEl(this._formateDate());
     }
     
@@ -134,6 +143,7 @@ class Calendar {
                 this.month = 0;
                 this.year++
             } else {
+                this.date = 1;
                 this.month++;
             } 
         } else {
@@ -141,17 +151,21 @@ class Calendar {
                 this.month = 11;
                 this.year--
             } else {
+                this.date = 1;
                 this.month--;
             } 
         }
-        this._clearCalendarLayout()
-        this._initCalendarLayout('day', 'day--bingo', 'day-tasksqty');
+        this._clearNotes();
+        this._clearCalendarLayout();
+        this._initCalendarLayout('day', 'day--active', 'day-tasksqty');
+        this._addEl(this._formateDate());
+
     }
 
     _addEl(itemKey) {
-      let el = `<h3 class="item-title">Title</h3>
-                <p class="item-text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iusto reprehenderit natus nihil veritatis voluptates, dicta iste voluptatem alias doloremque illo?</p>
-                <p class="item-date">2018-11-05</p>
+      let el = `<h3 class="item-title"></h3>
+                <p class="item-text"></p>
+                <p class="item-date"></p>
                 <div class="item-btns-block">
                     <a href="#done" class="item-btn" title="Отметить как выполненное">
                         <i class="fas fa-check-circle"></i>
@@ -227,6 +241,7 @@ class Calendar {
             this.currentNoteIndex = -1;
         }
         this._hideModalForInputNewNote();
+        this._addTaskQtyInDateEl('day-tasksqty');
     }
 
     _hideModalForInputNewNote() {
@@ -240,10 +255,9 @@ class Calendar {
     _itemBtnsHandler(e) {
         e.preventDefault();
         let noteItemIndex = this._findIndexElInList(e.target.closest("LI"));
-        
         let target = e.target.closest('a.item-btn');
         if(!target) return;
-         
+        
         let id = target.getAttribute('href');
         switch (id) {
             case '#done':
@@ -255,8 +269,9 @@ class Calendar {
                 target.closest('LI').classList.toggle('notes-item--complete');
                 break;
             case '#remove':
-                this._localStorageRemove(noteItemIndex)
+                this._localStorageRemove(noteItemIndex);
                 target.closest('LI').remove();
+                this._addTaskQtyInDateEl('day-tasksqty');
                 break;
             case '#edit':
                 this.modalForInputNewNote.style.display = 'block';

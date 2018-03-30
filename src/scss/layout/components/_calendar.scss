@@ -28,7 +28,7 @@ body {
         align-items: center;
     }
 
-        .month-name, .year-name {
+        .date-title {
             font-weight: bold;
             text-transform: capitalize;
             color: white;
@@ -91,19 +91,20 @@ body {
             height: 64px;
             cursor: pointer;
             position: relative;
-            
-                &--bingo {
-                    font-size: 1.8rem;
-                    box-shadow: 0 0 1px whitesmoke;
-                    color: whitesmoke;
-                    background: grey;
-
-                    &:hover {
-                        outline-offset: -1.5px;
-                        outline: 1.5px dashed whitesmoke;;
-                        font-weight: bold;
-                    }
+            font-size: 1.8rem;
+            box-shadow: 0 0 1px whitesmoke;
+            color: whitesmoke;
+            background: rgb(121, 121, 121);
+                &:hover {
+                    outline-offset: -1.5px;
+                    outline: 1.5px dashed whitesmoke;;
+                    font-weight: bold;
                 }
+                
+                &--active {
+                    background: #525252;
+                }
+
             }
                 .day-tasksqty {
                     display: inline-block;
@@ -115,6 +116,7 @@ body {
                     position: absolute;
                     right: 8px; top: 8px;
                     font-size: 0.6rem;
+                    display: none;
                 }
 
 .notes-group {
@@ -167,6 +169,7 @@ body {
                 text-decoration: line-through;
                 color: #a9a9a9;
             }
+            
         }
         
 
