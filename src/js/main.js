@@ -13,6 +13,7 @@ class Calendar {
         this.date = new Date().getDate();
         this.weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
         this.currentNoteIndex = -1;
+        this.currentSortStatus;
 
         // DOM
         this.mainLayout = document.querySelector('.main');
@@ -28,7 +29,8 @@ class Calendar {
         // modal For Input NewNote
         this.modalForInputNewNote = document.querySelector('.modal-newNote');
         this.modalClose = document.querySelector('.cancel');
-        
+        // sort btns
+        this.sortBtnsList = document.querySelector('.sort_btns-list');
         
         this._initCalendarLayout('day', 'day--active', 'day-tasksqty');
         this._initComponents(this.calendarWeekDays, 'dayWeek');
@@ -46,7 +48,31 @@ class Calendar {
         this.btnAddNewNote.addEventListener('click', this._btnAddNewNoteHandler.bind(this));
         this.modalForInputNewNote.querySelector('form').addEventListener('submit', this._getData.bind(this));
         this.modalClose.addEventListener('click', this._hideModalForInputNewNote.bind(this));
+        // sort btns'
+        this.sortBtnsList.addEventListener('click', this._changeSortStatus.bind(this));
+        // Note items (card)
         this.notesList.addEventListener('click', this._itemBtnsHandler.bind(this));
+    }
+
+    _changeSortStatus(e) {
+        if(e.target === e.currentTarget) return;
+        let target = e.target.closest('a');
+        this.currentSortStatus = target.getAttribute('href');
+        // console.log(this.currentSortStatus)
+        e.currentTarget.querySelector('.sort_btns-link--active').classList.remove('sort_btns-link--active');
+        target.classList.add('sort_btns-link--active');
+        this._sort();
+    }
+
+    _sort() {
+        let status = this.currentSortStatus.slice(1);
+        let sortList = this.notesList.querySelectorAll('li');
+        sortList.forEach((el) => {
+            el.style.display = 'none';
+            if(el.dataset.status !== status) {
+                el.style.display = '';
+            } 
+        })    
     }
 
     _btnAddNewNoteHandler(e) {
@@ -120,6 +146,7 @@ class Calendar {
         let date = target.dataset.date;
         this.date = (date.length == 1) ? '0' + date : date;
         this._addEl(this._formateDate());
+        this._sort();
     }
     
     _initComponents(weekDays, weekDaysClass) {
@@ -190,8 +217,11 @@ class Calendar {
                     newLi.querySelector('.item-text').innerHTML = item[i].note;
                     newLi.querySelector('.item-date').innerHTML = item[i].date;
                 if (item[i].done) {
+                    newLi.dataset.status = 'done';
                     newLi.querySelector('[href="#done"]').classList.add('item-btn--done');
                     newLi.classList.add('notes-item--complete');
+                } else {
+                    newLi.dataset.status = 'notdone';
                 }
                 document.querySelector('.notes-list').appendChild(newLi);
             }
@@ -266,7 +296,10 @@ class Calendar {
                 targetItem.done = !targetItem.done;
                 this._localStorageChange(itemsArr);
                 target.classList.toggle('item-btn--done');
-                target.closest('LI').classList.toggle('notes-item--complete');
+            let parent = target.closest('LI');
+                parent.classList.toggle('notes-item--complete');
+                parent.dataset.status = (parent.dataset.status === 'done') ? 'notdone' : 'done';
+                this._sort();
                 break;
             case '#remove':
                 this._localStorageRemove(noteItemIndex);
