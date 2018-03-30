@@ -15,34 +15,53 @@
 <body>
 	<div class="main">
 		<div class="container">
-			<div class="calendar-wrap">
-				<div class="btn-block">
-					<button class="btn" id="prevtMonth"><<</button>
-					<span class="date-title date-name"></span>
-					<span class="date-title month-name"></span>
-					<span class="date-title year-name"></span>
-					<button class="btn" id="nextMonth">>></button>
+			<div class="left-column">
+				<!-- CALENDAR -->
+	
+				<div class="calendar-wrap">
+					<div class="btn-block">
+						<button class="btn" id="prevtMonth"><<</button>
+						<span class="date-title date-name"></span>
+						<span class="date-title month-name"></span>
+						<span class="date-title year-name"></span>
+						<button class="btn" id="nextMonth">>></button>
+					</div>
+					<ul class="calendar-days"></ul>
+					<ul class="calendar-layout"></ul>
 				</div>
-				<ul class="calendar-days"></ul>
-				<ul class="calendar-layout"></ul>
+	
+				<!-- ./CALENDAR -->
+
 			</div>
-			<div class="notes-group">
-				<div class="addNoteBtn-row">
-					<button  class="addNoteBtn" type="button"> + </button>
+			<div class="right-column">
+				<!-- NOTES -->
+	
+				<div class="notes-group">
+					<div class="addNoteBtn-row">
+						<button  class="addNoteBtn" type="button"> + </button>
+					</div>
+					<ul class="sort_btns-list">
+						<li class="sort_btns-item"><a href="#all" class="sort_btns-link sort_btns-link--active">All</a></li>
+						<li class="sort_btns-item"><a href="#done" class="sort_btns-link">Not done</a></li>
+						<li class="sort_btns-item"><a href="#notdone" class="sort_btns-link">Done</a></li>
+					</ul>
+					<ul class="notes-list">
+					</ul>
 				</div>
-				<ul class="sort_btns-list">
-					<li class="sort_btns-item"><a href="#all" class="sort_btns-link sort_btns-link--active">All</a></li>
-					<li class="sort_btns-item"><a href="#done" class="sort_btns-link">Not done</a></li>
-					<li class="sort_btns-item"><a href="#notdone" class="sort_btns-link">Done</a></li>
-				</ul>
-				<ul class="notes-list">
-				</ul>
+	
+				<!-- ./NOTES -->
+
 			</div>
+
+
 		</div>
 	</div>
 	
-
+	<!-- ******* -->
 	<!-- modules -->
+	<!-- ******* -->
+
+	<!-- MODAL -->
 
 	<div class="modal-newNote">
 		<div class="cancel">[ x ]</div>
@@ -56,10 +75,11 @@
 			<label>Note
 				<textarea class="modal-input" name="note"></textarea>
 			</label>
-			<button class="modal-btn" type="submit">Добавить</button>
+			<button class="modal-btn" type="submit">Add</button>
 		</form>
-	</div> 
-  
+	</div>
+	 
+	<!-- ./MODAL -->
 
 	<script src="js/main.min.js"></script>
 </body>

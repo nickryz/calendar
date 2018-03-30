@@ -5,7 +5,7 @@ window.addEventListener('DOMContentLoaded', init);
 
 function init () {
     
-class Calendar {
+    class Calendar {
     constructor () {
         // helpers variable
         this.year = new Date().getFullYear();
@@ -14,8 +14,9 @@ class Calendar {
         this.weekDays = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
         this.currentNoteIndex = -1;
         this.currentSortStatus;
-
+        
         // DOM
+        // calendar
         this.mainLayout = document.querySelector('.main');
         this.calendarWrap = document.querySelector('.calendar-layout');
         this.calendarWeekDays = document.querySelector('.calendar-days');
@@ -23,132 +24,42 @@ class Calendar {
         this.dateName = document.querySelector('.date-name');
         this.monthName = document.querySelector('.month-name');
         this.yearName = document.querySelector('.year-name');
+        // notes
         this.btnAddNewNote = document.querySelector('.addNoteBtn');
         this.notesList = document.querySelector('.notes-list');
-        
         // modal For Input NewNote
         this.modalForInputNewNote = document.querySelector('.modal-newNote');
         this.modalClose = document.querySelector('.cancel');
         // sort btns
         this.sortBtnsList = document.querySelector('.sort_btns-list');
-        
+        // start
         this._initCalendarLayout('day', 'day--active', 'day-tasksqty');
         this._initComponents(this.calendarWeekDays, 'dayWeek');
-        this._addEl(this._formateDate())
+        this._createNewNoteEl(this._formateDate())
         this._events();
     }
-
+    
     _events() {
+        // next/prev month (btns)
         this.btnsMonth.forEach(el => {
             el.addEventListener('click', this._monthLayoutChange.bind(this))
         });
-
+        // select date in calendar layout
         this.calendarWrap.addEventListener('click', this._changeDayInCalendar.bind(this));
-        // modal For Input NewNote
-        this.btnAddNewNote.addEventListener('click', this._btnAddNewNoteHandler.bind(this));
-        this.modalForInputNewNote.querySelector('form').addEventListener('submit', this._getData.bind(this));
+        // add new note (btn)
+        this.btnAddNewNote.addEventListener('click', this._btnAddNewNoteModal.bind(this));
+        // modal for input new note data
+        this.modalForInputNewNote.querySelector('form').addEventListener('submit', this._handlerDataFromModal.bind(this));
         this.modalClose.addEventListener('click', this._hideModalForInputNewNote.bind(this));
-        // sort btns'
+        // sort btns
         this.sortBtnsList.addEventListener('click', this._changeSortStatus.bind(this));
-        // Note items (card)
+        // note items (card btns like edit, remove, delete)
         this.notesList.addEventListener('click', this._itemBtnsHandler.bind(this));
     }
-
-    _changeSortStatus(e) {
-        if(e.target === e.currentTarget) return;
-        let target = e.target.closest('a');
-        this.currentSortStatus = target.getAttribute('href');
-        e.currentTarget.querySelector('.sort_btns-link--active').classList.remove('sort_btns-link--active');
-        target.classList.add('sort_btns-link--active');
-        this._sort();
-    }
-
-    _sort() {
-        console.log(1)
-        if(!this.currentSortStatus) return; 
-        let status = this.currentSortStatus.slice(1) || null;
-        let sortList = this.notesList.querySelectorAll('li');
-        sortList.forEach((el) => {
-            el.style.display = 'none';
-            if(el.dataset.status !== status) {
-                el.style.display = '';
-            } 
-        })    
-    }
-
-    _btnAddNewNoteHandler(e) {
-        this.modalForInputNewNote.style.display = 'block';
-        this.mainLayout.style.filter = 'blur(3px)';
-        this.modalForInputNewNote.querySelector('[name="date"]').value = this._formateDate();
-    }
-
-    _initCalendarLayout(dayClass, dayActiveClass, taskQtyElClass) {
-        let d = new Date(this.year, this.month);
-        let daysInMonth = this._daysInMonth(this.year, this.month)
-        let firstDayInMonth = d.getDay();
-        for (let i = 0; i < daysInMonth; i++) {
-            let dayElem = document.createElement('LI');
-                (this.date - 1 == i) ? dayElem.classList.add(dayClass, dayActiveClass) : dayElem.classList.add(dayClass);
-                dayElem.dataset.date = i + 1;
-                dayElem.innerHTML = i + 1;
-                this.calendarWrap.appendChild(dayElem);
-            let taskQtyInDayEl = document.createElement('SPAN');
-                taskQtyInDayEl.classList.add(taskQtyElClass);
-                dayElem.appendChild(taskQtyInDayEl);
-            }
-            this.calendarWrap.firstChild.style.marginLeft = (firstDayInMonth !== 0) ? `${100 / 7 * (firstDayInMonth - 1)}%` : `${100 / 7 * 6}%`
-            this.dateName.innerHTML = this.date;
-            this.monthName.innerHTML = d.toLocaleString('en', { month: "long" });
-            this.yearName.innerHTML = this.year;
-            this._addTaskQtyInDateEl(taskQtyElClass);
-        }
-        
-    _addTaskQtyInDateEl(taskQtyElClass) {
-        let taskQtyInDayEl = document.querySelectorAll('.' + taskQtyElClass);
-        taskQtyInDayEl.forEach((el) => {
-            let date = el.parentElement.dataset.date;
-            let elLength = this._getTaskQtyInDate(date);
-            if (elLength && elLength !== el.innerHTML) {
-                el.innerHTML = elLength;
-                el.style.display = 'inline';  
-            } else {
-                el.style.display = null;
-            }
-        }) 
-    }
-
-    _getTaskQtyInDate(i) {
-        let date = (i < 10) ? '0' + i : i;
-        let localStorage = this._localStorageRead(this._formateDate().slice(0, -2) + date);
-        if (!localStorage || !localStorage.length) return;
-        return localStorage.length;
-    }
     
     
-    _clearCalendarLayout() {
-        while (this.calendarWrap.firstChild) {
-            this.calendarWrap.removeChild(this.calendarWrap.firstChild);
-        }
-    }
-
-    _clearNotes() {
-        this.notesList.querySelectorAll('li').forEach((el) => {
-            el.remove()
-        })
-    }
-
-    _changeDayInCalendar(e) {
-        if(e.target === e.currentTarget) return;
-        
-        this._clearNotes(); 
-        document.querySelector('.day--active').classList.remove('day--active');
-        let target = e.target.closest('li');
-            target.classList.add('day--active');
-        let date = target.dataset.date;
-        this.date = (date.length == 1) ? '0' + date : date;
-        this._addEl(this._formateDate());
-        this._sort();
-    }
+    
+    // calendar layout
     
     _initComponents(weekDays, weekDaysClass) {
         this.weekDays.forEach(el => {
@@ -159,7 +70,46 @@ class Calendar {
         });
     }
 
-    _daysInMonth(year, month) {
+    _initCalendarLayout(dayClass, dayActiveClass, taskQtyElClass) {
+        let d = new Date(this.year, this.month);
+        let daysInMonth = this._getQtyDaysInMonth(this.year, this.month)
+        let firstDayInMonth = d.getDay();
+        for (let i = 0; i < daysInMonth; i++) {
+            let dayElem = document.createElement('LI');
+            (this.date - 1 == i) ? dayElem.classList.add(dayClass, dayActiveClass) : dayElem.classList.add(dayClass);
+            dayElem.dataset.date = i + 1;
+            dayElem.innerHTML = i + 1;
+            this.calendarWrap.appendChild(dayElem);
+            let taskQtyInDayEl = document.createElement('SPAN');
+            taskQtyInDayEl.classList.add(taskQtyElClass);
+            dayElem.appendChild(taskQtyInDayEl);
+        }
+        this.calendarWrap.firstChild.style.marginLeft = (firstDayInMonth !== 0) ? `${100 / 7 * (firstDayInMonth - 1)}%` : `${100 / 7 * 6}%`
+        this.dateName.innerHTML = this.date;
+        this.monthName.innerHTML = d.toLocaleString('en', { month: "long" });
+        this.yearName.innerHTML = this.year;
+        this._addTaskQtyInDateEl(taskQtyElClass);
+    }
+    
+    _clearCalendarLayout() {
+        while (this.calendarWrap.firstChild) {
+            this.calendarWrap.removeChild(this.calendarWrap.firstChild);
+        }
+    }
+    
+    _changeDayInCalendar(e) {
+        if(e.target === e.currentTarget) return;
+        this._clearNotes(); 
+        document.querySelector('.day--active').classList.remove('day--active');
+        let target = e.target.closest('li');
+            target.classList.add('day--active');
+        let date = target.dataset.date;
+        this.date = (date.length == 1) ? '0' + date : date;
+        this._createNewNoteEl(this._formateDate());
+        this._sort();
+    }
+    
+    _getQtyDaysInMonth(year, month) {
         return new Date(year, month + 1, 0).getDate();
     }
 
@@ -186,11 +136,115 @@ class Calendar {
         this._clearNotes();
         this._clearCalendarLayout();
         this._initCalendarLayout('day', 'day--active', 'day-tasksqty');
-        this._addEl(this._formateDate());
+        this._createNewNoteEl(this._formateDate());
 
     }
+    
+    _addTaskQtyInDateEl(taskQtyElClass) {
+        let taskQtyInDayEl = document.querySelectorAll('.' + taskQtyElClass);
+        taskQtyInDayEl.forEach((el) => {
+            let date = el.parentElement.dataset.date;
+            let elLength = this._getTaskQtyInDate(date);
+            if (elLength && elLength !== el.innerHTML) {
+                el.innerHTML = elLength;
+                el.style.display = 'inline';  
+            } else {
+                el.style.display = null;
+            }
+        }) 
+    }
+    
+    _getTaskQtyInDate(i) {
+        let date = (i < 10) ? '0' + i : i;
+        let localStorage = this._localStorageRead(this._formateDate().slice(0, -2) + date);
+        if (!localStorage || !localStorage.length) return;
+        return localStorage.length;
+    }
+    
+    // sort function
+    
+    _changeSortStatus(e) {
+        e.preventDefault();
+        if(e.target === e.currentTarget) return;
+        let target = e.target.closest('a');
+        this.currentSortStatus = target.getAttribute('href');
+        e.currentTarget.querySelector('.sort_btns-link--active').classList.remove('sort_btns-link--active');
+        target.classList.add('sort_btns-link--active');
+        this._sort();
+    }
+    
+    _sort() {
+        if(!this.currentSortStatus) return; 
+        let status = this.currentSortStatus.slice(1) || null;
+        let sortList = this.notesList.querySelectorAll('li');
+        sortList.forEach((el) => {
+            el.style.display = 'none';
+            if(el.dataset.status !== status) {
+                el.style.display = '';
+            } 
+        })    
+    }
+    
+    
+    // notes block
+    
+    _btnAddNewNoteModal(e) {
+        this.modalForInputNewNote.style.display = 'block';
+        this.mainLayout.style.filter = 'blur(3px)';
+        this.modalForInputNewNote.querySelector('[name="date"]').value = this._formateDate();
+    }
+    
+    _getValues() {
+        let title = this.modalForInputNewNote.querySelector('[name="title"]').value;
+        let date = this.modalForInputNewNote.querySelector('[name="date"]').value;
+        let note = this.modalForInputNewNote.querySelector('[name="note"]').value;
+        return {
+            title: title,
+            date: date,
+            note: note,
+            done: false
+        }
+    }
+    
+    _handlerDataFromModal(e) { 
+        e.preventDefault();
+        if(this.currentNoteIndex === -1) {
+            let data = this._getValues();
+            this._localStoragePush(data);
+        } else if (this.currentNoteIndex >= 0){
+            let data = this._getValues();
+            let itemsArr = this._localStorageRead(data.date);
+            if (!itemsArr || data.date !== this._formateDate()) {
+                this._localStoragePush(data);
+                this._localStorageRemove(this.currentNoteIndex);
+                document.querySelectorAll('.notes-item')[this.currentNoteIndex].remove();
+            } else if (data.date == this._formateDate()) {
+                let currentArr = this._localStorageRead(data.date);
+                currentArr[this.currentNoteIndex] = data;
+                this._localStorageChange(currentArr)
+                this._changeEl(data.date);
+            }
+            this.currentNoteIndex = -1;
+        }
+        this._hideModalForInputNewNote();
+        this._addTaskQtyInDateEl('day-tasksqty');
+    }
 
-    _addEl(itemKey) {
+    _hideModalForInputNewNote() {
+        this.modalForInputNewNote.querySelectorAll('[name]').forEach((el) => {
+            el.value = '';
+        })
+        this.modalForInputNewNote.style.display = null;
+        this.mainLayout.style.filter = null;
+    }
+    
+    _clearNotes() {
+        this.notesList.querySelectorAll('li').forEach((el) => {
+            el.remove()
+        })
+    }
+
+    _createNewNoteEl(itemKey) {
       let el = `<h3 class="item-title"></h3>
                 <p class="item-text"></p>
                 <p class="item-date"></p>
@@ -240,49 +294,6 @@ class Calendar {
         }
     }
 
-    _getValues() {
-        let title = this.modalForInputNewNote.querySelector('[name="title"]').value;
-        let date = this.modalForInputNewNote.querySelector('[name="date"]').value;
-        let note = this.modalForInputNewNote.querySelector('[name="note"]').value;
-        return {
-            title: title,
-            date: date,
-            note: note,
-            done: false
-        }
-    }
-    
-    _getData(e) { 
-        e.preventDefault();
-        if(this.currentNoteIndex === -1) {
-            let data = this._getValues();
-            this._localStoragePush(data);
-        } else if (this.currentNoteIndex >= 0){
-            let data = this._getValues();
-            let itemsArr = this._localStorageRead(data.date);
-            if (!itemsArr || data.date !== this._formateDate()) {
-                this._localStoragePush(data);
-                this._localStorageRemove(this.currentNoteIndex);
-                document.querySelectorAll('.notes-item')[this.currentNoteIndex].remove();
-            } else if (data.date == this._formateDate()) {
-                let currentArr = this._localStorageRead(data.date);
-                currentArr[this.currentNoteIndex] = data;
-                this._localStorageChange(currentArr)
-                this._changeEl(data.date);
-            }
-            this.currentNoteIndex = -1;
-        }
-        this._hideModalForInputNewNote();
-        this._addTaskQtyInDateEl('day-tasksqty');
-    }
-
-    _hideModalForInputNewNote() {
-        this.modalForInputNewNote.querySelectorAll('[name]').forEach((el) => {
-            el.value = '';
-        })
-        this.modalForInputNewNote.style.display = null;
-        this.mainLayout.style.filter = null;
-    }
 
     _itemBtnsHandler(e) {
         e.preventDefault();
@@ -320,6 +331,9 @@ class Calendar {
         }
     }
         
+    
+    // helpers functions
+    
     _localStoragePush(noteData) {
         let itemsArr = (localStorage.getItem(noteData.date)) ? JSON.parse(localStorage.getItem(noteData.date)) : [];
         itemsArr.push(noteData);
@@ -329,7 +343,7 @@ class Calendar {
         let nameFormateDate = this._formateDate();
         
         if (noteData.date == nameFormateDate) {
-            this._addEl(noteData.date);
+            this._createNewNoteEl(noteData.date);
         }
     }
 
