@@ -11,7 +11,7 @@ class Calendar {
         this.year = new Date().getFullYear();
         this.month = new Date().getMonth();
         this.date = new Date().getDate();
-        this.weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+        this.weekDays = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
         this.currentNoteIndex = -1;
         this.currentSortStatus;
 
@@ -58,14 +58,15 @@ class Calendar {
         if(e.target === e.currentTarget) return;
         let target = e.target.closest('a');
         this.currentSortStatus = target.getAttribute('href');
-        // console.log(this.currentSortStatus)
         e.currentTarget.querySelector('.sort_btns-link--active').classList.remove('sort_btns-link--active');
         target.classList.add('sort_btns-link--active');
         this._sort();
     }
 
     _sort() {
-        let status = this.currentSortStatus.slice(1);
+        console.log(1)
+        if(!this.currentSortStatus) return; 
+        let status = this.currentSortStatus.slice(1) || null;
         let sortList = this.notesList.querySelectorAll('li');
         sortList.forEach((el) => {
             el.style.display = 'none';
@@ -225,7 +226,8 @@ class Calendar {
                 }
                 document.querySelector('.notes-list').appendChild(newLi);
             }
-        }        
+        }
+        this._sort();        
     }
 
     _changeEl(itemKey) {
