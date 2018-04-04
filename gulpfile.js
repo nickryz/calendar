@@ -19,7 +19,7 @@ var gulp 				= require('gulp'),
 // module.exports = {
 // 	entry: ['babel-polyfill', "src/js/main.js"]
 // };
-
+// commit
 
 gulp.task('compress', function () {
 	gulp.src('dist/img/**/')
@@ -37,10 +37,10 @@ gulp.task('css', function () {
 			cascade: false
 		}))
 		.pipe(csso())
-		.pipe(rename({
-			extname: '.css',
-			suffix: '.min'
-		}))
+		// .pipe(rename({
+		// 	extname: '.css',
+		// 	suffix: '.min'
+		// }))
 		.pipe(gulp.dest('dist/css'))
 		.pipe(browserSync.stream())
 });
@@ -48,13 +48,13 @@ gulp.task('css', function () {
 gulp.task('js', function () {
 	return gulp.src('src/js/*.js')
 		.pipe(plumber())
-		.pipe(browserify({
-			debug: true,
-			transform: [babelify.configure({
-				presets: ['es2015']
-			})]
-		}))
-		.pipe(concat('main.min.js'))
+		// .pipe(browserify({
+		// 	debug: true,
+		// 	transform: [babelify.configure({
+		// 		presets: ['es2015']
+		// 	})]
+		// }))
+		// .pipe(concat('main.min.js'))
 		// .pipe(uglify())
 		.pipe(gulp.dest('dist/js'))
 		.pipe(browserSync.stream());

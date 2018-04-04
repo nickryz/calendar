@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Calendar</title>
-	<link rel="stylesheet" href="css/main.min.css">
+	<link rel="stylesheet" href="css/main.css">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" integrity="sha384-3AB7yXWz4OeoZcPbieVW64vVXEwADiYyAEhwilzWsLw+9FgqpyjjStpPnpBO8o8S"
 	 crossorigin="anonymous">
 </head>
@@ -62,25 +62,26 @@
 	<!-- ******* -->
 
 	<!-- MODAL -->
-
-	<div class="modal-newNote">
-		<div class="cancel">[ x ]</div>
-		<form class="modal-form">
-			<label>Title
-				<input class="modal-input" name="title" type="text" required>
-			</label>
-			<label>Date
-				<input class="modal-input" name="date" type="date" required>
-			</label>
-			<label>Note
-				<textarea class="modal-input" name="note"></textarea>
-			</label>
-			<button class="modal-btn" type="submit">Add</button>
-		</form>
-	</div>
+	<div class="modal-wrap">
+		<div class="modal-newNote">
+			<div class="cancel">[ x ]</div>
+			<form class="modal-form">
+				<label>Title
+					<input class="modal-input" name="title" type="text" required>
+				</label>
+				<label>Date
+					<input class="modal-input" name="date" type="date" required>
+				</label>
+				<label>Note
+					<textarea class="modal-input" name="note"></textarea>
+				</label>
+				<button class="modal-btn" type="submit">Add</button>
+			</form>
+		</div>
+</div>
 	 
 	<!-- ./MODAL -->
 
-	<script src="js/main.min.js"></script>
+	<script src="js/main.js"></script>
 </body>
 </html>
