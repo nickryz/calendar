@@ -3,7 +3,7 @@
 }
 
 html, body {
-  height: 100%;
+  min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif ;
  
 }
@@ -11,19 +11,21 @@ html, body {
 body {
    background-attachment: fixed;
    overflow-y: scroll;
-   background: linear-gradient(273deg, #fbf7df, #f7f6ca);
-   background-size: 400% 400%;
-   animation: gradient 5s ease infinite;
-
-   @keyframes gradient { 
-        0%{background-position:0% 56%}
-        50%{background-position:100% 45%}
-        100%{background-position:0% 56%}
-   }
+   background: #3a3a3a;
+   font-family: Jua;
 }
+
 .main {
     width: 100%;
     height: 100%;
+}
+
+.main__title {
+    text-align: center;
+    color: yellow;
+    margin: 0;
+    padding: 50px 0;
+    font-size: 3rem;
 }
 
 .container {
@@ -44,14 +46,13 @@ body {
     .btn-block {
         display: flex;
         justify-content: space-between;
-        background: darkgray;
         align-items: center;
     }
 
         .date-title {
             font-weight: bold;
             text-transform: capitalize;
-            color: white;
+            color: $mainfontdark;
         }
 
         .btn {
@@ -59,14 +60,16 @@ body {
             border: none;
             padding: 0;
             margin: 5px;
-            width: 30px;
-            height: 30px;
             font-size: 1rem;
             font-weight: bold;
-            border-radius: 20px;
-            color: black;
-            box-shadow: 1px 1px 5px rgb(99, 96, 96);
+            background: transparent;
+            color: $mainfontdark;
             cursor: pointer;
+            transition: 0.3s color ease;
+
+            &:hover {
+                color: $mainfontlight;
+            }
         }
 
     .calendar-wrap {
@@ -74,9 +77,10 @@ body {
         height: 480px;
         padding: 10px;
         margin: 5px auto 0 auto;
-        background-color: darkgray;
-        border-radius: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); 
+        background-color: $maindark;
+        border-radius: 3px;
+        color: $mainfontlight;
+        // box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); 
     }
 
         .calendar-days {
@@ -93,7 +97,7 @@ body {
                 
 
                 &:nth-of-type(7n - 1), &:nth-of-type(7n) {
-                color:rgb(124, 19, 0); 
+                color:$mainred; 
                 }
             }
 
@@ -106,35 +110,34 @@ body {
         }
 
             .day {
-            width: 14.286%;
-            padding: 10px;
-            height: 64px;
-            cursor: pointer;
-            position: relative;
-            font-size: 1.8rem;
-            box-shadow: 0 0 1px whitesmoke;
-            color: whitesmoke;
-            background: rgb(121, 121, 121);
-                &:hover {
-                    outline-offset: -1.5px;
-                    outline: 1.5px dashed whitesmoke;;
-                    font-weight: bold;
-                }
-                
-                &--active {
-                    background: #525252;
-                }
+                width: 14.286%;
+                padding: 10px;
+                height: 64px;
+                cursor: pointer;
+                position: relative;
+                font-size: 1.8rem;
+                background-color: $maindark;
+                text-align: center;
+                line-height: 1.5;
+                transition: 0.6s background-color ease;
+                    &:hover {
+                        outline-offset: -1.5px;
+                    }
+                    
+                    &--active {
+                        background-color: #525252;
+                        font-weight: bold;
+                    }
 
             }
                 .day-tasksqty {
                     display: inline-block;
                     width: 20px;
-                    text-align: center;
-                    background: darkblue;
+                    background: $mainred;
                     line-height: 20px;
                     border-radius: 50%;
                     position: absolute;
-                    right: 8px; top: 8px;
+                    right: 3px; top: 3px;
                     font-size: 0.6rem;
                     display: none;
                 }
@@ -151,19 +154,14 @@ body {
             border: none;
             padding: 0;
             margin: 5px;
-            width: 60px;
+            width: 100%;
             height: 60px;
             font-size: 1rem;
             font-weight: bold;
-            background: rgb(250, 69, 69);
-            border-radius: 50%;
-            color: white;
-            box-shadow: 1px 1px 5px rgb(99, 96, 96);
+            background: $mainred;
+            border-radius: 3px;
+            color: $mainfontlight;
             cursor: pointer;
-
-            &:active {
-                box-shadow: none;
-            }
         }
     
     .notes-list {
@@ -174,20 +172,20 @@ body {
 
         .notes-item {
             padding: 15px 50px;
-            border-radius: 20px;
-            background: #a9a9a9;
+            border-radius: 3px;
+            background: $maindark;
             max-width: 780px;
             margin: 0 auto 5px auto;
             max-width: 780px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); 
+            color: $mainfontlight;
 
             &--complete {
-                background: #dfdfdf;
+                // background: #dfdfdf;
             }
 
             &--complete > h3, &--complete > p {
                 text-decoration: line-through;
-                color: #a9a9a9;
+                color: $mainfontdark;
             }
 
             
@@ -217,7 +215,12 @@ body {
                 .item-btn {
                     text-decoration: none;
                     margin-left: 25px;
-                    color: rgb(255, 255, 255);
+                    color: #525252;
+                    transition: 0.3s color ease;
+                    
+                    &:hover {
+                        color: $mainfontlight;
+                    }
                     
                     &:first-child {
                         margin-left: 0;
@@ -226,6 +229,7 @@ body {
                     &--done {
                         color: green;
                     }
+
                 }
 
                 .item-title:first-letter, .item-text:first-letter {
@@ -237,7 +241,7 @@ body {
         margin: 0 0 25px 0;
         padding: 0;
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
     }
         .sort_btns-item {
             margin-left: 50px;
@@ -252,14 +256,18 @@ body {
                 padding: 10px 0;
                 width: 100px;
                 text-align: center;
-                background: rgb(160, 160, 160);
-                color: whitesmoke;
-                border-radius: 10px;
-                box-shadow: 1px 1px 5px #636060;
+                background: $maindark;
+                color: $mainfontdark;
+                border-radius: 3px;
+                transition: 0.3s color ease;
 
                 &--active {
-                    background: darkblue;
-                    box-shadow: none;
+                    background: #525252;
+                    color: $mainfontlight;
+                }
+
+                &:hover {
+                    color: $mainfontlight;
                 }
         }
 
@@ -269,26 +277,26 @@ body {
     position: fixed;
     width: 100%;
     height: 110%;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.1);
     top: 0;
     display: none;
+    font-family: Jua;
 }
 
     .modal-newNote {
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%, -50%);
+        // width: 400px;
         min-width: 400px;
-        background: #a9a9a9;
+        max-width: 400px;
+        background: $maindark;
         padding: 30px;
-        border-radius: 20px;
+        border-radius: 3px;
         font-size: 1rem;
-        font-weight: bold;
         line-height: 2;
         text-align: center;
-        color: whitesmoke;
-        box-shadow: 0 0 15px rgba(0,0,0,0.8);
-
+        color: $mainfontlight;
         textarea {
             height: 100px;
         }
@@ -298,17 +306,42 @@ body {
             position: absolute;
             right: 20px; top: 10px;
             cursor: pointer;
-            color: rgb(124, 19, 0);
+            color: $mainred;
         }
 
         .modal-input {
             display: block;
             width: 100%;
+            color: $mainfontdark;
             margin-bottom: 15px;
+            border-radius: 3px;
+            background: #3a3a3a;
+            border: none;
+            line-height: 2;
+            transition: 0.3s color ease;
+            min-width: 100%;
+            max-width: 100%;
+            max-height: 50vh;
+            font-family: Jua;
+
+            &:focus {
+                color: $mainfontlight;
+            }
         }
 
         .modal-btn {
+            outline: 0;
+            border: 0;
             padding: 10px;
+            margin: 5px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 700;
+            background: #fa4545;
+            border-radius: 3px;
+            color: #f5f5f5;
+            cursor: pointer;
+            font-family: Jua;
         }
 
 

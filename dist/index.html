@@ -11,47 +11,49 @@
 	<link rel="stylesheet" href="css/main.css">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" integrity="sha384-3AB7yXWz4OeoZcPbieVW64vVXEwADiYyAEhwilzWsLw+9FgqpyjjStpPnpBO8o8S"
 	 crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Jua" rel="stylesheet">
 </head>
 <body>
 	<div class="main">
+		<h1 class="main__title">TODO</h1>
 		<div class="container">
-			<div class="left-column">
-				<!-- CALENDAR -->
-	
-				<div class="calendar-wrap">
-					<div class="btn-block">
-						<button class="btn" id="prevtMonth"><<</button>
-						<span class="date-title date-name"></span>
-						<span class="date-title month-name"></span>
-						<span class="date-title year-name"></span>
-						<button class="btn" id="nextMonth">>></button>
+				<div class="left-column">
+					<!-- CALENDAR -->
+		
+					<div class="calendar-wrap">
+						<div class="btn-block">
+							<button class="btn" id="prevtMonth"><<</button>
+							<span class="date-title date-name"></span>
+							<span class="date-title month-name"></span>
+							<span class="date-title year-name"></span>
+							<button class="btn" id="nextMonth">>></button>
+						</div>
+						<ul class="calendar-days"></ul>
+						<ul class="calendar-layout"></ul>
 					</div>
-					<ul class="calendar-days"></ul>
-					<ul class="calendar-layout"></ul>
-				</div>
-	
-				<!-- ./CALENDAR -->
+		
+					<!-- ./CALENDAR -->
 
-			</div>
-			<div class="right-column">
-				<!-- NOTES -->
-	
-				<div class="notes-group">
-					<div class="addNoteBtn-row">
-						<button  class="addNoteBtn" type="button"> + </button>
+				</div>
+				<div class="right-column">
+					<!-- NOTES -->
+		
+					<div class="notes-group">
+						<div class="addNoteBtn-row">
+							<button  class="addNoteBtn" type="button"> <i class="fas fa-plus"></i> </button>
+						</div>
+						<ul class="sort_btns-list">
+							<li class="sort_btns-item"><a href="#done" class="sort_btns-link">Not done</a></li>
+							<li class="sort_btns-item"><a href="#all" class="sort_btns-link sort_btns-link--active">All</a></li>
+							<li class="sort_btns-item"><a href="#notdone" class="sort_btns-link">Done</a></li>
+						</ul>
+						<ul class="notes-list">
+						</ul>
 					</div>
-					<ul class="sort_btns-list">
-						<li class="sort_btns-item"><a href="#all" class="sort_btns-link sort_btns-link--active">All</a></li>
-						<li class="sort_btns-item"><a href="#done" class="sort_btns-link">Not done</a></li>
-						<li class="sort_btns-item"><a href="#notdone" class="sort_btns-link">Done</a></li>
-					</ul>
-					<ul class="notes-list">
-					</ul>
-				</div>
-	
-				<!-- ./NOTES -->
+		
+					<!-- ./NOTES -->
 
-			</div>
+				</div>
 
 
 		</div>
@@ -64,7 +66,7 @@
 	<!-- MODAL -->
 	<div class="modal-wrap">
 		<div class="modal-newNote">
-			<div class="cancel">[ x ]</div>
+			<div class="cancel"><i class="fas fa-window-close"></i></div>
 			<form class="modal-form">
 				<label>Title
 					<input class="modal-input" name="title" type="text" required>
@@ -75,7 +77,7 @@
 				<label>Note
 					<textarea class="modal-input" name="note"></textarea>
 				</label>
-				<button class="modal-btn" type="submit">Add</button>
+				<button class="modal-btn" type="submit">Add / Edit</button>
 			</form>
 		</div>
 </div>
